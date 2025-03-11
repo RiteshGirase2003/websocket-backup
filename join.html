@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Session</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input {
+            padding: 8px;
+            font-size: 16px;
+            width: 150px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Enter Your 4-Character Session Code</h2>
+    <input type="text" id="sessionInput" maxlength="4" placeholder="Enter Code">
+    <button onclick="joinSession()">Join</button>
+
+    <p id="message" style="color: red; font-weight: bold;"></p>
+
+    <script>
+        function joinSession() {
+            const inputElement = document.getElementById("sessionInput");
+            const messageElement = document.getElementById("message");
+            const sessionCode = inputElement.value.trim();
+
+            // Validation: Ensure 4-character length and only A-Z, a-z, 0-9
+            const validPattern = /^[A-Za-z0-9]{4}$/;
+            if (!validPattern.test(sessionCode)) {
+                messageElement.textContent = "Invalid code! Use exactly 4 letters/numbers.";
+                return;
+            }
+
+            // Store in localStorage
+            localStorage.setItem("token", sessionCode);
+            messageElement.style.color = "green";
+            messageElement.textContent = "Session token saved successfully! Redirecting...";
+
+            // Redirect to index.html after a short delay
+            setTimeout(() => {
+                window.location.href = "chat.html";
+            }, 1000);
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #chat-block p { width: 80%; margin: 4px auto; height: auto; overflow-y: auto;background: #dbffdc ; border: 1px solid #abffae; padding: 10px; }
+        #chat-block {height: 70vh; overflow-y: auto; border: 1px solid #69e4ff; padding: 10px; }
+        input { width: 40%; padding: 10px; }
+        button { padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Simple WebSocket Chat</h2>
+    <div id="chat-block">
+        <p id="chat-box"></p>
+    </div>
+    <br>
+    <input type="text" id="message" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        let token = localStorage.getItem("token");
+        let ws = new WebSocket("http://localhost:9218/ws/"+token);
+        console.log(localStorage.getItem("token"));
+        ws.onmessage = function(event) {
+            let chatBox = document.getElementById("chat-block");
+            let messageData = JSON.parse(event.data); 
+
+            let message = document.createElement("p");
+            message.textContent = messageData.content;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // // Show alert only when message is received from another user
+            // if (!messageData.isSender && messageData.content.trim().toLowerCase() === "hello") {
+            //     alert("This is an alert for hello (Received)");
+            // }
+        };
+
+        function sendMessage() {
+            let messageInput = document.getElementById("message");
+            if (messageInput.value.trim() !== "") {
+                ws.send(messageInput.value);
+                messageInput.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
