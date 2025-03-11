@@ -38,7 +38,7 @@
 
     <script>
         function fetchSession() {
-            fetch("http://localhost:9218/genSession")
+            fetch("https://websocket-backup.onrender.com/genSession")
                 .then(response => response.json())  // Convert response to JSON
                 .then(data => {
                     if (data.session_id) {
