@@ -1,11 +1,47 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"math/rand"
+	"time"
 	"github.com/gorilla/websocket"
-	"encoding/json"
 )
+
+
+
+var initiator = []string{}
+
+const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+func generateRandomString() string {
+	rand.Seed(time.Now().UnixNano())
+	result := make([]byte, 4)
+	for i := range result {
+		result[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(result)
+}
+
+func getUniqueString() string {
+	for {
+		newStr := generateRandomString()
+		exists := false
+		for _, s := range initiator {
+			if s == newStr {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			return newStr
+		}
+	}
+}
+
+
+
 
 // WebSocket upgrader
 var upgrader = websocket.Upgrader{
@@ -54,17 +90,43 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func genLink() string {
-	
+
+func GenSession(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	sessionID := getUniqueString()
+	response := map[string]string{"session_id": sessionID}
+
+	genLink(sessionID)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+
+func genLink(code string ) {
+	api := fmt.Sprintf("/ws/%s", code)
+	http.HandleFunc(api, handleConnections)
 }
 
 
 func main() {
-	http.HandleFunc("/ws", handleConnections)
+	http.HandleFunc("/genSession", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
+		GenSession(w, r)
+	})
 
-	// Start server
 	port := ":9218"
 	fmt.Println("Server running on http://localhost" + port)
 	err := http.ListenAndServe(port, nil)
