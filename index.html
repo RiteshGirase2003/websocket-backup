@@ -19,8 +19,9 @@
     <button onclick="sendMessage()">Send</button>
 
     <script>
-        let ws = new WebSocket("http://localhost:9218/ws");
-
+        let token = localStorage.getItem("token");
+        let ws = new WebSocket("http://localhost:9218/ws/"+token);
+        console.log(localStorage.getItem("token"));
         ws.onmessage = function(event) {
             let chatBox = document.getElementById("chat-box");
             let messageData = JSON.parse(event.data); // Parse JSON message
@@ -30,10 +31,10 @@
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Show alert only when message is received from another user
-            if (!messageData.isSender && messageData.content.trim().toLowerCase() === "hello") {
-                alert("This is an alert for hello (Received)");
-            }
+            // // Show alert only when message is received from another user
+            // if (!messageData.isSender && messageData.content.trim().toLowerCase() === "hello") {
+            //     alert("This is an alert for hello (Received)");
+            // }
         };
 
         function sendMessage() {
