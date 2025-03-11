@@ -20,7 +20,7 @@
 
     <script>
         let token = localStorage.getItem("token");
-        let ws = new WebSocket("http://localhost:9218/ws/"+token);
+        let ws = new WebSocket("https://websocket-backup.onrender.com/ws/"+token);
         console.log(localStorage.getItem("token"));
         ws.onmessage = function(event) {
             let chatBox = document.getElementById("chat-box");
