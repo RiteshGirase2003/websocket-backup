@@ -4,13 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fetch Session ID</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #copyBtn {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
     <h2>Session ID Fetcher</h2>
     <button onclick="fetchSession()">Get Session ID</button>
+    <button id="copyBtn" onclick="copyToClipboard()">Copy to Clipboard</button>
     
     <p><strong>Session ID:</strong> <span id="session"></span></p>
+    <p id="message" style="color: green;"></p>
+
+    <a href="chat.html" id="joinBtn" style="display: none;">
+        <button>Join</button>
+    </a>
+    
+
 
     <script>
         function fetchSession() {
@@ -20,12 +44,30 @@
                     if (data.session_id) {
                         localStorage.setItem("token", data.session_id);  // Store in localStorage
                         document.getElementById("session").innerText = data.session_id;  // Display on page
+                        
+                        // Enable the copy button
+                        document.getElementById("copyBtn").style.display = "inline-block";
+                        document.getElementById("joinBtn").style.display = "inline-block";
+
                     } else {
                         console.error("Invalid response format");
                     }
                 })
                 .catch(error => console.error("Error fetching session:", error));
         }
+
+        function copyToClipboard() {
+            const sessionId = document.getElementById("session").innerText;
+            if (!sessionId) return;
+
+            navigator.clipboard.writeText(sessionId)
+                .then(() => {
+                    document.getElementById("message").innerText = "Copied to clipboard!";
+                })
+                .catch(err => console.error("Error copying text:", err));
+        }
+
+       
     </script>
 
 </body>
